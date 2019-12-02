@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 include(CryptoNoteWallet.cmake)
 include(QREncode.cmake)
 
+list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
+
 project(${CN_PROJECT_NAME})
 
 execute_process(COMMAND git log -1 --pretty=format:%h
@@ -17,6 +19,8 @@ include_directories(${CMAKE_BINARY_DIR}
     cryptonote/include
     cryptonote/src
     libqrencode)
+
+set(WITH_SSL TRUE)
 
 find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
@@ -34,8 +38,16 @@ if ((${Boost_MAJOR_VERSION} EQUAL 1) AND (${Boost_MINOR_VERSION} EQUAL 54))
 	message(SEND_ERROR "Boost version 1.54 is unsupported, more details are available here http://goo.gl/RrCFmA")
 endif ()
 
+if (WITH_SSL)
+  find_package(Secure)
+endif()
+
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
+
+if (WITH_SSL AND SECURE_FOUND)
+  include_directories(${SECURE_INCLUDE_DIR})
+endif()
 
 set(VERSION "")
 configure_file("cryptonote/src/version.h.in" "version.h")
@@ -153,6 +165,7 @@ set(CRYPTONOTE_SOURCES
   cryptonote/src/System/EventLock.cpp
   cryptonote/src/System/InterruptedException.cpp
   cryptonote/src/System/Ipv4Address.cpp
+  cryptonote/src/System/SocketStream.cpp
   cryptonote/src/System/TcpStream.cpp
   cryptonote/src/HTTP/HttpRequest.cpp
   cryptonote/src/HTTP/HttpParser.cpp
@@ -261,6 +274,10 @@ target_link_libraries(Mnemonics ${Boost_LIBRARIES})
 add_executable(${PROJECT_NAME} ${BUILD_PLATFORM} ${BUILD_RESOURCES} ${SOURCES} ${HEADERS} ${UIS} ${RCC})
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS _GNU_SOURCE)
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${QTMAIN} ${CRYPTONOTE_LIB} ${QRENCODE_LIB} Mnemonics)
+
+if (WITH_SSL AND SECURE_FOUND)
+  target_link_libraries(${PROJECT_NAME} ${SECURE_LIBRARIES})
+endif()
 
 if (APPLE)
   target_link_libraries(${PROJECT_NAME} Qt5::PrintSupport)
