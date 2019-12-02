@@ -106,12 +106,12 @@ Node::~Node() {
 class RpcNode : CryptoNote::INodeObserver, public Node {
 public:
   Logging::LoggerManager& m_logManager;
-  RpcNode(const CryptoNote::Currency& currency, INodeCallback& callback, Logging::LoggerManager& logManager, const std::string& nodeHost, unsigned short nodePort) :
+  RpcNode(const CryptoNote::Currency& currency, INodeCallback& callback, Logging::LoggerManager& logManager, const std::string& nodeHost, unsigned short nodePort, bool &enableSSL) :
     m_callback(callback),
     m_currency(currency),
     m_dispatcher(),
     m_logManager(logManager),
-    m_node(nodeHost, nodePort) {
+    m_node(nodeHost, nodePort, "/", enableSSL) {
     m_node.addObserver(this);
   }
 
@@ -139,7 +139,7 @@ public:
 
     try {
         //CryptoNote::HttpClient httpClient(m_dispatcher, "127.0.0.1", Settings::instance().getCurrentLocalDaemonPort());
-        CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+        CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
 
         CryptoNote::invokeJsonCommand(httpClient, "/start_mining", req, res);
 
@@ -162,7 +162,7 @@ public:
 
       try {
          //CryptoNote::HttpClient httpClient(m_dispatcher, "127.0.0.1", Settings::instance().getCurrentLocalDaemonPort());
-         CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+         CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
 
           CryptoNote::invokeJsonCommand(httpClient, "/stop_mining", req, res);
           std::string err = interpret_rpc_response(true, res.status);
@@ -209,7 +209,7 @@ public:
     try {
         CryptoNote::COMMAND_RPC_GET_INFO::request req;
         CryptoNote::COMMAND_RPC_GET_INFO::response res;
-        CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+        CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
         CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
         std::string err = interpret_rpc_response(true, res.status);
       if (err.empty())
@@ -231,7 +231,7 @@ public:
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
-          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
           CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
           std::string err = interpret_rpc_response(true, res.status);
         if (err.empty())
@@ -253,7 +253,7 @@ public:
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
-          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
           CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
           std::string err = interpret_rpc_response(true, res.status);
         if (err.empty())
@@ -275,7 +275,7 @@ public:
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
-          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
           CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
           std::string err = interpret_rpc_response(true, res.status);
         if (err.empty())
@@ -297,7 +297,7 @@ public:
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
-          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
           CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
           std::string err = interpret_rpc_response(true, res.status);
         if (err.empty())
@@ -319,7 +319,7 @@ public:
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
-          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
           CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
           std::string err = interpret_rpc_response(true, res.status);
         if (err.empty())
@@ -341,7 +341,7 @@ public:
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
-          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
           CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
           std::string err = interpret_rpc_response(true, res.status);
         if (err.empty())
@@ -363,7 +363,7 @@ public:
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
-          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
           CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
           std::string err = interpret_rpc_response(true, res.status);
         if (err.empty())
@@ -385,7 +385,7 @@ public:
       try {
           CryptoNote::COMMAND_RPC_GET_INFO::request req;
           CryptoNote::COMMAND_RPC_GET_INFO::response res;
-          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort);
+          CryptoNote::HttpClient httpClient(m_dispatcher, m_node.m_nodeHost, m_node.m_nodePort, m_node.m_daemon_ssl);
           CryptoNote::invokeJsonCommand(httpClient, "/getinfo", req, res);
           std::string err = interpret_rpc_response(true, res.status);
         if (err.empty())
@@ -616,8 +616,8 @@ private:
   }
 };
 
-Node* createRpcNode(const CryptoNote::Currency& currency, INodeCallback& callback, Logging::LoggerManager& logManager,  const std::string& nodeHost, unsigned short nodePort) {
-  return new RpcNode(currency, callback, logManager, nodeHost, nodePort);
+Node* createRpcNode(const CryptoNote::Currency& currency, INodeCallback& callback, Logging::LoggerManager& logManager,  const std::string& nodeHost, unsigned short nodePort, bool enableSSL) {
+  return new RpcNode(currency, callback, logManager, nodeHost, nodePort, enableSSL);
 }
 
 Node* createInprocessNode(const CryptoNote::Currency& currency, Logging::LoggerManager& logManager,
