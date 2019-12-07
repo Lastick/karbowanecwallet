@@ -284,7 +284,7 @@ if (APPLE)
 elseif (UNIX)
   target_link_libraries(${PROJECT_NAME} -lpthread)
 elseif (WIN32)
-  target_link_libraries(${PROJECT_NAME} Imm32 Iphlpapi Winmm)
+  target_link_libraries(${PROJECT_NAME} crypt32 Imm32 Iphlpapi Winmm)
 endif (APPLE)
 
 qt5_use_modules(${PROJECT_NAME} Widgets Gui Network)
