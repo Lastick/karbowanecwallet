@@ -67,6 +67,7 @@ private:
   bool m_isAboutToQuit;
   QList<QAction*> recentFileActionList;
   const int maxRecentFiles;
+  quint64 m_oldBalance;
 
   QTranslator m_translator; // contains the translations for this application
   QTranslator m_translatorQt; // contains the translations for qt
@@ -97,6 +98,7 @@ private:
   void walletSynchronized(int _error, const QString& _error_text);
   void walletOpened(bool _error, const QString& _error_text);
   void walletClosed();
+  void walletBalanceNotify(quint64 balance);
   void updateWalletAddress(const QString& _address);
   void reset();
   void onShowQR();

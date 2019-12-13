@@ -80,6 +80,7 @@ MainWindow::MainWindow() : QMainWindow(), m_ui(new Ui::MainWindow), m_trayIcon(n
   m_isAboutToQuit(false), paymentServer(0), optimizationManager(nullptr), maxRecentFiles(10), trayIconMenu(0), toggleHideAction(0) {
   m_ui->setupUi(this);
   m_wn = new WalletNotifier();
+  m_oldBalance = 0;
   m_connectionStateIconLabel = new QPushButton();
   m_connectionStateIconLabel->setFlat(true); // Make the button look like a label, but clickable
   m_connectionStateIconLabel->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
@@ -90,7 +91,6 @@ MainWindow::MainWindow() : QMainWindow(), m_ui(new Ui::MainWindow), m_trayIcon(n
   m_synchronizationStateIconLabel = new AnimatedLabel(this);
   connectToSignals();
   createLanguageMenu();
-  m_wn->pushNotification("test\ntest test");
   initUi();
   walletClosed();
 }
@@ -113,6 +113,8 @@ void MainWindow::connectToSignals() {
   connect(&WalletAdapter::instance(), &WalletAdapter::walletSynchronizationProgressUpdatedSignal,
     this, &MainWindow::walletSynchronizationInProgress, Qt::QueuedConnection);
   connect(&WalletAdapter::instance(), &WalletAdapter::walletSynchronizationCompletedSignal, this, &MainWindow::walletSynchronized
+    , Qt::QueuedConnection);
+  connect(&WalletAdapter::instance(), &WalletAdapter::walletActualBalanceUpdatedSignal, this, &MainWindow::walletBalanceNotify
     , Qt::QueuedConnection);
   connect(&WalletAdapter::instance(), &WalletAdapter::walletStateChangedSignal, this, &MainWindow::setStatusBarText);
   connect(&WalletAdapter::instance(), &WalletAdapter::walletInitCompletedSignal, this, &MainWindow::walletOpened);
@@ -1093,6 +1095,20 @@ void MainWindow::walletClosed() {
   }
   Settings::instance().setTrackingMode(false);
   updateRecentActionList();
+}
+
+void MainWindow::walletBalanceNotify(quint64 balance) {
+  const QString ticker = CurrencyAdapter::instance().getCurrencyTicker().toUpper();
+  QString mess;
+  if (m_oldBalance != balance) {
+    if (m_oldBalance > 0) {
+      mess += "Your balance was change";
+      if (m_oldBalance < balance) mess += " (increased by: " + CurrencyAdapter::instance().formatAmount(balance - m_oldBalance) + " " + ticker + ")";
+      else mess += " (decreases by: -" + CurrencyAdapter::instance().formatAmount(m_oldBalance - balance) + " " + ticker + ")";
+      m_wn->pushNotification(mess);
+    }
+    m_oldBalance = balance;
+  }
 }
 
 void MainWindow::checkTrackingMode() {

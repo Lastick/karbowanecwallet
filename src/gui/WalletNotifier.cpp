@@ -35,6 +35,7 @@ WalletNotifier::WalletNotifier(QWidget *parent) : QWidget(parent) {
  
   label.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
   label.setStyleSheet("QLabel { color : #15315E; "
+                      "font: normal 14px;"
                       "margin-top: 6px;"
                       "margin-bottom: 6px;"
                       "margin-left: 10px;"
@@ -45,6 +46,8 @@ WalletNotifier::WalletNotifier(QWidget *parent) : QWidget(parent) {
 
   timer = new QTimer();
   connect(timer, &QTimer::timeout, this, &WalletNotifier::hideAnimation);
+
+  m_beepEnable = true;
 }
 
 void WalletNotifier::paintEvent(QPaintEvent *event) {
@@ -58,7 +61,7 @@ void WalletNotifier::paintEvent(QPaintEvent *event) {
   roundedRect.setY(rect().y() + 5);
   roundedRect.setWidth(rect().width() - 10);
   roundedRect.setHeight(rect().height() - 10);
-  painter.setBrush(QBrush(QColor(133, 167, 211, 180)));
+  painter.setBrush(QBrush(QColor(133, 167, 211, 255)));
   painter.setPen(Qt::NoPen);
 
   painter.drawRoundedRect(roundedRect, 10, 10);
@@ -68,6 +71,11 @@ void WalletNotifier::pushNotification(const QString &text) {
   label.setText(text);
   adjustSize();
   show();
+  if (m_beepEnable) QApplication::beep();
+}
+
+void WalletNotifier::pushBeepMode(const bool beepEnable) {
+  m_beepEnable = beepEnable;
 }
 
 void WalletNotifier::show() {
@@ -83,7 +91,7 @@ void WalletNotifier::show() {
   QWidget::show();
 
   animation.start();
-  timer->start(3000);
+  timer->start(10000);
 }
 
 void WalletNotifier::hideAnimation() {

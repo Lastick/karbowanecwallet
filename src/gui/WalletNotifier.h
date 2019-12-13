@@ -42,6 +42,7 @@ class WalletNotifier : public QWidget {
 
   public slots:
     void pushNotification(const QString &text);
+    void pushBeepMode(const bool beepEnable);
  
   private slots:
     void show();
@@ -49,6 +50,7 @@ class WalletNotifier : public QWidget {
     void hide();
  
   private:
+    bool m_beepEnable;
     QLabel label;
     QGridLayout layout;
     QPropertyAnimation animation;
