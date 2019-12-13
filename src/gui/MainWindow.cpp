@@ -79,6 +79,7 @@ MainWindow& MainWindow::instance() {
 MainWindow::MainWindow() : QMainWindow(), m_ui(new Ui::MainWindow), m_trayIcon(nullptr), m_tabActionGroup(new QActionGroup(this)),
   m_isAboutToQuit(false), paymentServer(0), optimizationManager(nullptr), maxRecentFiles(10), trayIconMenu(0), toggleHideAction(0) {
   m_ui->setupUi(this);
+  m_wn = new WalletNotifier();
   m_connectionStateIconLabel = new QPushButton();
   m_connectionStateIconLabel->setFlat(true); // Make the button look like a label, but clickable
   m_connectionStateIconLabel->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
@@ -89,6 +90,7 @@ MainWindow::MainWindow() : QMainWindow(), m_ui(new Ui::MainWindow), m_trayIcon(n
   m_synchronizationStateIconLabel = new AnimatedLabel(this);
   connectToSignals();
   createLanguageMenu();
+  m_wn->pushNotification("test\ntest test");
   initUi();
   walletClosed();
 }

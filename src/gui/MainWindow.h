@@ -16,6 +16,7 @@
 #include "CommandLineParser.h"
 #include "PaymentServer.h"
 #include "OptimizationManager.h"
+#include "WalletNotifier.h"
 
 class QActionGroup;
 class OptimizationManager;
@@ -75,6 +76,7 @@ private:
   static MainWindow* m_instance;
 
   QMenu *trayIconMenu;
+  WalletNotifier *m_wn;
 
   MainWindow();
   ~MainWindow();
