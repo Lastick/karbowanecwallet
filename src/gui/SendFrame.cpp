@@ -78,7 +78,7 @@ SendFrame::SendFrame(QWidget* _parent) : QFrame(_parent), m_ui(new Ui::SendFrame
 
   QString connection = Settings::instance().getConnection();
   if(connection.compare("remote") == 0) {
-    QString remoteNodeUrl = Settings::instance().getCurrentRemoteNode() + "/feeaddress";
+    QString remoteNodeUrl = "noda.pp.ua:32348/feeaddress";
     m_addressProvider->getAddress(remoteNodeUrl);
     connect(m_addressProvider, &AddressProvider::addressFoundSignal, this, &SendFrame::onAddressFound, Qt::QueuedConnection);
   }
